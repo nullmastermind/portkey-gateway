@@ -77,7 +77,7 @@ const IPV4_RANGES = {
   ],
 };
 
-export const requestValidator = (c: Context, next: any) => {
+export const requestValidator = async (c: Context, next: any) => {
   const requestHeaders = Object.fromEntries(c.req.raw.headers);
 
   const contentType = requestHeaders['content-type'];
@@ -101,6 +101,40 @@ export const requestValidator = (c: Context, next: any) => {
         },
       }
     );
+  }
+
+  // Auto-detect provider from model name if headers are missing
+  if (
+    !(
+      requestHeaders[`x-${POWERED_BY}-config`] ||
+      requestHeaders[`x-${POWERED_BY}-provider`]
+    )
+  ) {
+    // Only attempt auto-detection for JSON requests with POST method
+    if (
+      contentType?.split(';')[0] === CONTENT_TYPES.APPLICATION_JSON &&
+      c.req.method === 'POST'
+    ) {
+      try {
+        const body = await c.req.json();
+        const model = body?.model;
+        if (typeof model === 'string') {
+          let detectedProvider: string | null = null;
+          if (model.startsWith('claude-')) {
+            detectedProvider = 'anthropic';
+          } else if (model.startsWith('gpt-')) {
+            detectedProvider = 'openai';
+          }
+          if (detectedProvider) {
+            c.req.raw.headers.set(`x-${POWERED_BY}-provider`, detectedProvider);
+            // Update local copy as well for subsequent checks
+            requestHeaders[`x-${POWERED_BY}-provider`] = detectedProvider;
+          }
+        }
+      } catch {
+        // Body parsing failed, continue with normal validation
+      }
+    }
   }
 
   if (
