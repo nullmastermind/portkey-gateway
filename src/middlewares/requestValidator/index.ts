@@ -126,9 +126,41 @@ export const requestValidator = async (c: Context, next: any) => {
             detectedProvider = 'openai';
           }
           if (detectedProvider) {
-            c.req.raw.headers.set(`x-${POWERED_BY}-provider`, detectedProvider);
+            const envConfig = Environment(c);
+            const retryAttempts = parseInt(
+              envConfig?.AUTO_DETECT_RETRY_ATTEMPTS || '3',
+              10
+            );
+            const retryStatusCodesStr =
+              envConfig?.AUTO_DETECT_RETRY_STATUS_CODES || '429,502,503,504';
+            const retryStatusCodes = retryStatusCodesStr
+              .split(',')
+              .map((code: string) => parseInt(code.trim(), 10))
+              .filter((code: number) => !isNaN(code));
+
+            // Extract API key from Authorization header (Bearer token) or x-api-key header
+            const authHeader = requestHeaders['authorization'];
+            const apiKey = authHeader
+              ? authHeader.replace(/^Bearer\s+/i, '')
+              : requestHeaders['x-api-key'];
+
+            const autoConfig: Record<string, any> = {
+              retry: {
+                attempts: retryAttempts,
+                on_status_codes: retryStatusCodes,
+              },
+              provider: detectedProvider,
+            };
+
+            // Add api_key to config if available
+            if (apiKey) {
+              autoConfig.api_key = apiKey;
+            }
+
+            const configJson = JSON.stringify(autoConfig);
+            c.req.raw.headers.set(`x-${POWERED_BY}-config`, configJson);
             // Update local copy as well for subsequent checks
-            requestHeaders[`x-${POWERED_BY}-provider`] = detectedProvider;
+            requestHeaders[`x-${POWERED_BY}-config`] = configJson;
           }
         }
       } catch {

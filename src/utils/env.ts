@@ -136,6 +136,13 @@ const nodeEnv = {
 
   ANTHROPIC_BASE_URL: getValueOrFileContents(process.env.ANTHROPIC_BASE_URL),
   OPENAI_BASE_URL: getValueOrFileContents(process.env.OPENAI_BASE_URL),
+
+  AUTO_DETECT_RETRY_ATTEMPTS: getValueOrFileContents(
+    process.env.AUTO_DETECT_RETRY_ATTEMPTS
+  ),
+  AUTO_DETECT_RETRY_STATUS_CODES: getValueOrFileContents(
+    process.env.AUTO_DETECT_RETRY_STATUS_CODES
+  ),
 };
 
 export const Environment = (c?: Context) => {
