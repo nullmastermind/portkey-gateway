@@ -133,6 +133,9 @@ const nodeEnv = {
   TRUSTED_CUSTOM_HOSTS: getValueOrFileContents(
     process.env.TRUSTED_CUSTOM_HOSTS
   ),
+
+  ANTHROPIC_BASE_URL: getValueOrFileContents(process.env.ANTHROPIC_BASE_URL),
+  OPENAI_BASE_URL: getValueOrFileContents(process.env.OPENAI_BASE_URL),
 };
 
 export const Environment = (c?: Context) => {

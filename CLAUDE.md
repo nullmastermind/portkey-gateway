@@ -90,3 +90,13 @@ Tests are organized by component:
 The gateway uses `conf.json` for runtime configuration. Sample config available in `conf_sample.json`.
 
 Key environment variables and configuration handled through Hono's adapter system for multi-environment deployment.
+
+## Development Rules
+
+**Testing Policy**
+- Do NOT run tests automatically unless explicitly requested by the user
+- Only run `npm run test:gateway`, `npm run test:plugins`, or any test commands when the user directly asks for it
+
+**Build Verification**
+- After completing code changes, ALWAYS run `npm run build` to ensure the build passes
+- Do not consider work complete until the build succeeds without errors

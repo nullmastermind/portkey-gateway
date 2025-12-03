@@ -1,7 +1,9 @@
 import { ProviderAPIConfig } from '../types';
+import { Environment } from '../../utils/env';
 
 const OpenAIAPIConfig: ProviderAPIConfig = {
-  getBaseURL: () => 'https://api.openai.com/v1',
+  getBaseURL: ({ c }) =>
+    (Environment(c).OPENAI_BASE_URL as string) || 'https://api.openai.com/v1',
   headers: ({ providerOptions, fn }) => {
     const headersObj: Record<string, string> = {
       Authorization: `Bearer ${providerOptions.apiKey}`,

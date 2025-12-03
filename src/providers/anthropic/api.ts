@@ -1,7 +1,10 @@
 import { ProviderAPIConfig } from '../types';
+import { Environment } from '../../utils/env';
 
 const AnthropicAPIConfig: ProviderAPIConfig = {
-  getBaseURL: () => 'https://api.anthropic.com/v1',
+  getBaseURL: ({ c }) =>
+    (Environment(c).ANTHROPIC_BASE_URL as string) ||
+    'https://api.anthropic.com/v1',
 
   headers: ({ providerOptions, fn, gatewayRequestBody }) => {
     const apiKey =

@@ -146,3 +146,7 @@ plugins/**/.creds.json
 plugins/**/creds.json
 plugins/**/.parameters.json
 src/handlers/tests/.creds.json
+auggie_shell.ps1
+auggie_shell.sh
+auggie_shell_user_request.txt
+auggie_shell_conversation.txt
